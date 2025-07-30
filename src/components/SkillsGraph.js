@@ -1,83 +1,39 @@
-// src/components/SkillsGraph.js
-import React, { useEffect, useRef } from 'react';
-import {
-  Chart,
-  BarController,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import React from 'react';
+import { Box, Typography, Paper } from '@mui/material';
+import { Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { SmartToy } from '@mui/icons-material';
 
-// ✅ REGISTER EVERYTHING REQUIRED FOR A BAR CHART
-Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-const SkillsGraph = () => {
-  const chartRef = useRef(null);
-  const chartInstanceRef = useRef(null);
-
-  useEffect(() => {
-    const canvas = chartRef.current;
-    const ctx = canvas.getContext('2d');
-
-    // ✅ DESTROY EXISTING CHART INSTANCE
-    if (chartInstanceRef.current) {
-      chartInstanceRef.current.destroy();
-    }
-
-    // ✅ CREATE NEW CHART INSTANCE
-    chartInstanceRef.current = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['React', 'Node.js', 'Java', 'Python', 'SQL'],
-        datasets: [
-          {
-            label: 'Skill Level',
-            data: [8, 6, 7, 5, 6],
-            backgroundColor: [
-              '#3f51b5',
-              '#f50057',
-              '#00acc1',
-              '#4caf50',
-              '#ff9800'
-            ],
-            borderRadius: 5
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-          }
+const SkillsGraph = ({ skillData }) => {
+  const options = {
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'right' },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return `${context.label}: ${context.raw}% proficiency`;
+          },
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Proficiency'
-            }
-          }
-        }
-      }
-    });
-
-    // ✅ CLEANUP CHART ON UNMOUNT
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-    };
-  }, []);
+      },
+    },
+  };
 
   return (
-    <div style={{ maxWidth: 600, margin: 'auto' }}>
-      <canvas ref={chartRef}></canvas>
-    </div>
+    <Paper sx={{ p: 3, mb: 3, borderRadius: 3 }}>
+      <Typography variant="h5" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+        <SmartToy sx={{ mr: 1, color: '#667eea' }} />
+        AI-Powered Skill Analysis
+      </Typography>
+      <Typography variant="subtitle1" color="textSecondary" sx={{ mb: 3 }}>
+        Personalized insights based on your profile and career goals
+      </Typography>
+      <Box sx={{ height: 300 }}>
+        <Doughnut data={skillData} options={options} />
+      </Box>
+    </Paper>
   );
 };
 
